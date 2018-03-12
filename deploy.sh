@@ -116,6 +116,9 @@ modify_scraper_config(){
 
 modify_docker_compose_config(){
     # $1: password of the database
+
+    sed -i "s/_BASE_DIR_/${BASE_DIR//\//\\/}/g" ${DOCKER_COMPOSE_CONFIG}
+
     if [ -n "$1" ];then
         local pattern="POSTGRES_PASSWORD:.*"
         local setting="POSTGRES_PASSWORD: $1"
@@ -137,11 +140,13 @@ delete_all_current_containers(){
 start_service(){
     cd ${DOCKER_COMPOSE_DIR}
     docker-compose up -d $@
+    cd ${BASE_DIR}
 }
 
 stop_service(){
     cd ${DOCKER_COMPOSE_DIR}
     docker-compose stop
+    cd ${BASE_DIR}
 }
 
 cleanup(){

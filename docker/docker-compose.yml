@@ -34,7 +34,7 @@ services:
     container_name: web01
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn my_focus_news.wsgi -b 0.0.0.0:8001"
     volumes:
-      - ../../../my_focus_news:/src
+      - _BASE_DIR_/my_focus_news:/src
       - /static
     expose:
       - "8001"
@@ -52,7 +52,7 @@ services:
     container_name: scraper01
     command: bash -c "sleep 30 && python schedule.py"
     volumes:
-      - ../../../news_scraper:/src
+      - _BASE_DIR_/news_scraper:/src
     depends_on:
       - db
       - web
