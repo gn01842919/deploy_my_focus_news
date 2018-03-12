@@ -1,12 +1,8 @@
 #!/bin/bash
 
-
+# Base
 BASE_DIR=`pwd`
-
 GIT_PROJECT_BASE='https://github.com/gn01842919'
-
-
-
 
 # my_focus_news (Django)
 WEB_PROJECT="my_focus_news"
@@ -25,10 +21,10 @@ DB_API_PROJECT="db_operation_api"
 DB_API_DIR="${SCRAPER_DIR}/${DB_API_PROJECT}"
 
 # backup
-CONF_BACKUP_DIR="${WEB_DIR}/deployment/.deploy_backup"
+CONF_BACKUP_DIR=".deploy_backup"
 
 # docker
-DOCKER_COMPOSE_DIR="${WEB_DIR}/deployment/docker"
+DOCKER_COMPOSE_DIR="docker"
 DOCKER_COMPOSE_CONFIG="${DOCKER_COMPOSE_DIR}/docker-compose.yml"
 BACKUP_DOCKER_COMPOSE_CONFIG="docker-compose.yml.backup"
 DOCKERFILE_FOLDER="${DOCKER_COMPOSE_DIR}/my-python-env"
@@ -82,7 +78,7 @@ restore_config(){
 
 copy_pip_requirements_for_building_images(){
     local filename="requirements.txt"
-    cp "${WEB_DIR}/deployment/${filename}" "${DOCKERFILE_FOLDER}/${WEB_PROJECT}-${filename}"
+    cp "${WEB_DIR}/${filename}" "${DOCKERFILE_FOLDER}/${WEB_PROJECT}-${filename}"
     cp "${SCRAPER_DIR}/${filename}" "${DOCKERFILE_FOLDER}/${SCRAPER_PROJECT}-${filename}"
 }
 
@@ -182,10 +178,9 @@ case "$1" in
         if [ "$2" = "clean" ]; then
             restore_all_configs
             cleanup
-            clone_or_update_project_sources
         fi
 
-        # build_base_image
+        clone_or_update_project_sources
 
         copy_pip_requirements_for_building_images
 

@@ -1,4 +1,5 @@
 
+[這是之前手動佈署時的筆記]
 
 =================================================
                 Deployment Notes
@@ -31,7 +32,7 @@
 
     3) 考慮把目前所有容器都砍掉:
         docker stop $(docker ps -a -q) ; docker rm $(docker ps -a -q)
-        
+
     4) 考慮把前一次 Build 出來的 images 砍掉:
         docker rmi docker_scraper docker_web
 
