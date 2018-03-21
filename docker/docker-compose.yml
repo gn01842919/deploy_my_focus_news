@@ -15,7 +15,7 @@ services:
     image: nginx:1.13-alpine
     container_name: nginx01
     ports:
-      - "8080:80"
+      - "10001:80"
     volumes:
       - ./nginx/config:/etc/nginx/conf.d
     volumes_from:

@@ -86,7 +86,7 @@ modify_django_config(){
     # $1: Hostname or ip for 'ALLOWED_HOSTS'
     # $2: password of the database
     local pattern_allow_hosts='^ALLOWED_HOSTS = .*'
-    local allow_hosts_setting="ALLOWED_HOSTS = ['$1']"
+    local allow_hosts_setting="ALLOWED_HOSTS = ['$1', 'localhost']"
     sed -i "s/${pattern_allow_hosts}/${allow_hosts_setting}/g" ${DJANGO_CONFIG}
 
     local pattern_debug='^DEBUG = .*'
@@ -181,8 +181,8 @@ case "$1" in
         db_password=`prompt_for_db_password`
 
         if [ "$2" = "clean" ]; then
-            restore_all_configs
             cleanup
+            restore_all_configs
         fi
 
         clone_or_update_project_sources
@@ -201,6 +201,10 @@ case "$1" in
         start_service
         ;;
     stop)
+        stop_service
+        ;;
+    restart)
+        start_service
         stop_service
         ;;
     restore)
