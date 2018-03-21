@@ -175,10 +175,26 @@ prompt_for_db_password(){
     echo $password
 }
 
+get_hostname(){
+    if [ -n "${SITE_HOSTNAME}" ];then
+	echo "${SITE_HOSTNAME}"
+    else
+        echo `prompt_for_hostname`
+    fi
+}
+
+get_password(){
+    if [ -n "${DB_PASSWORD}" ];then
+        echo "${DB_PASSWORD}"
+    else
+        echo `prompt_for_db_password`
+    fi
+}
+
 case "$1" in
     setup)
-        hostname_or_ip=`prompt_for_hostname`
-        db_password=`prompt_for_db_password`
+        hostname_or_ip=`get_hostname`
+        db_password=`get_password`
 
         if [ "$2" = "clean" ]; then
             cleanup

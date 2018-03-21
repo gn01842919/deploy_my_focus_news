@@ -17,8 +17,8 @@
           3. **docker-compose**: POSTGRES_PASSWORD，以及 web 與 scraper 的 volumes 設定
 
 3. . 執行 `sh deploy.sh setup`
-    - 此程式會要求使用者輸入資料庫密碼，以及網站 host name (用在 Django 的 ALLOWED_HOSTS 設定)，並覆蓋原先設定。
-    - 資料庫密碼與 host name 皆可接受空白輸入，若 host name 為空白，會自動抓取環境中的 IP。若密碼為空白，則使用程式碼中寫死的資料庫密碼。
+    - 建議先將 host name 與 database 寫入環境變數 SITE_HOSTNAME 與 DB_PASSWORD，此程式會將其讀出來，並覆蓋程式中的設定。例如: `export SITE_HOSTNAME="my.hostname.com"; export DB_PASSWORD="database_password" ; sh deploy.sh setup`
+    - 若前述兩個環境變數為空，程式會要求使用者輸入。兩者皆可接受空白輸入，若 host name 為空白，會自動抓取環境中的 IP。若密碼為空白，則使用程式碼中寫死的資料庫密碼。
     - 以下設定無論如何都會被覆寫:
         1. **Django**: DEBUG ==> False
         2. **news_scraper**: ERROR_LOG ==> '/src/scraper_error.log'
