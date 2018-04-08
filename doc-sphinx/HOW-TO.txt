@@ -1,0 +1,82 @@
+參考:
+- https://myapollo.com.tw/2016/09/11/python-autodoc/
+- http://www.sphinx-doc.org/en/stable/ext/napoleon.html
+
+1. 啟用虛擬環境:
+    source /home/kyan/venv/bin/activate
+
+2. 安裝 Sphinx
+    pip install sphinx
+
+3. 建立資料夾結構
+    mkdir doc-sphinx
+    cd doc-sphinx
+    mkdir doc src
+
+4. 下載我要產生文件的程式
+    cd src
+    git clone https://github.com/gn01842919/news_scraper.git
+    git clone https://github.com/gn01842919/db_operation_api.git news_scraper/db_operation_api
+    cd ..
+
+5. 安裝相依的套件:
+    pip install -r src/news_scraper/requirements.txt
+
+6. 執行  sphinx-quickstart doc
+
+    過程中我違反預設值的選項有:
+
+        > Separate source and build directories (y/n) [n]: y
+
+        > Project name: my_focus_news
+        > Author name(s): gn01842919
+
+        > autodoc: automatically insert docstrings from modules (y/n) [n]: y
+        > intersphinx: link between Sphinx documentation of different projects (y/n) [n]: y
+        > viewcode: include links to the source code of documented Python objects (y/n) [n]: y
+
+7. 修改 doc/source/conf.py
+
+    A. 加上:
+        import os
+        import sys
+        sys.path.insert(0, os.path.abspath('../../src/'))
+        sys.path.insert(0, os.path.abspath('../../src/news_scraper/'))
+        sys.path.insert(0, os.path.abspath('../../src/news_scraper/db_operation_api/'))
+
+    B. 在 extentions = [.....] 裡面加上:
+        'sphinx.ext.napoleon',
+
+    C. (Optional) 加上 napoleon 的選項:
+        napoleon_google_docstring = True
+        napoleon_numpy_docstring = False
+        napoleon_include_init_with_doc = False
+        napoleon_include_private_with_doc = False
+        napoleon_include_special_with_doc = False
+        napoleon_use_admonition_for_examples = False
+        napoleon_use_admonition_for_notes = False
+        napoleon_use_admonition_for_references = False
+        napoleon_use_ivar = False
+        napoleon_use_param = False
+        napoleon_use_rtype = False
+
+    D. (Optional) 更改主題:
+        html_theme = 'alabaster'
+       更改為:
+        html_theme = 'bizstyle'  # 或是其他的主題皆可
+
+8. 使用 sphinx-apidoc 自動產生 rst 檔:
+    sphinx-apidoc -f -o doc/source src/
+
+9. 把產生出來的 rst 檔案名稱 (news_scraper) 加入 index.rst (注意要有一個空行)
+   例如:
+        .. toctree::
+           :maxdepth: 2
+           :caption: Contents:
+
+           news_scraper
+
+10. 依喜好調整相關的 rst 檔
+
+11. 產生 HTML 檔案:
+    sphinx-build -b html doc/source doc/build
