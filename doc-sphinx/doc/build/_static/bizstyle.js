@@ -36,6 +36,6 @@ $(window).resize(function(){
         $("li.nav-item-0 a").text("Top");
     }
     else {
-        $("li.nav-item-0 a").text("my_focus_news  documentation");
+        $("li.nav-item-0 a").text("news_scraper  documentation");
     }
 });

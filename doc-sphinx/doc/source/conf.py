@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath('../../src/news_scraper/db_operation_api/'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'my_focus_news'
+project = 'news_scraper'
 copyright = '2018, gn01842919'
 author = 'gn01842919'
 
@@ -121,7 +121,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'my_focus_newsdoc'
+htmlhelp_basename = 'news_scraperdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -148,7 +148,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'my_focus_news.tex', 'my\\_focus\\_news Documentation',
+    (master_doc, 'news_scraper.tex', 'news\\_scraper Documentation',
      'gn01842919', 'manual'),
 ]
 
@@ -158,7 +158,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'my_focus_news', 'my_focus_news Documentation',
+    (master_doc, 'news_scraper', 'news_scraper Documentation',
      [author], 1)
 ]
 
@@ -169,8 +169,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'my_focus_news', 'my_focus_news Documentation',
-     author, 'my_focus_news', 'One line description of project.',
+    (master_doc, 'news_scraper', 'news_scraper Documentation',
+     author, 'news_scraper', 'One line description of project.',
      'Miscellaneous'),
 ]
 
