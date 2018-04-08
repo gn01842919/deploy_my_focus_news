@@ -1,0 +1,356 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>news_scraper.db_news_api &#8212; my_focus_news  documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for news_scraper.db_news_api</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module provides tools to CRUD news_data and scraping_rules in the DB.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        with scraper_models.get_database(DATABASE_CONFIG) as conn:</span>
+<span class="sd">            db_api = NewsDatabaseAPI(conn, table_prefix=&quot;my_focus_news&quot;)</span>
+<span class="sd">            rules = db_api.get_scraping_rules()</span>
+<span class="sd">            print(rules)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="c1"># PyPI</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">from</span> <span class="nn">psycopg2</span> <span class="k">import</span> <span class="n">IntegrityError</span>
+<span class="c1"># Local modules</span>
+<span class="kn">from</span> <span class="nn">scraper_models</span> <span class="k">import</span> <span class="n">NewsRSSEntry</span><span class="p">,</span> <span class="n">ScrapingRule</span>
+<span class="kn">import</span> <span class="nn">scraper_utils</span>
+
+
+<div class="viewcode-block" id="NewsDatabaseAPI"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI">[docs]</a><span class="k">class</span> <span class="nc">NewsDatabaseAPI</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class provides APIs to manipulate models in the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conn (db_operation_api.mydb.MyDB): A database connection.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_table_prefix</span> <span class="o">=</span> <span class="s2">&quot;shownews_&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
+
+<div class="viewcode-block" id="NewsDatabaseAPI.get_news_data_and_setup_rule"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI.get_news_data_and_setup_rule">[docs]</a>    <span class="k">def</span> <span class="nf">get_news_data_and_setup_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scraping_rules</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read news data from DB and set scraping_rules to them.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scraping_rules (Iterable(ScrapingRule)): Scraping_rules to decide</span>
+<span class="sd">                whether each news is of interest.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dict that maps id to a news.</span>
+<span class="sd">                &lt;Key&gt;: id filed of a news in the database.</span>
+<span class="sd">                &lt;Value&gt;: An instance of ``NewsRSSEntry``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">get_fields_by_conditions</span><span class="p">(</span>
+            <span class="s2">&quot;shownews_newsdata&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="nb">id</span><span class="p">:</span> <span class="n">NewsRSSEntry</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">pub_time</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">scraping_rules</span><span class="p">)</span>
+            <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">pub_time</span> <span class="ow">in</span> <span class="n">rows</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="NewsDatabaseAPI.get_scraping_rules"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI.get_scraping_rules">[docs]</a>    <span class="k">def</span> <span class="nf">get_scraping_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read scraping rules from DB.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dict that maps id to a scraping rule.</span>
+<span class="sd">                &lt;Key&gt;: id filed of a rule in the database.</span>
+<span class="sd">                &lt;Value&gt;: An instance of ``ScrapingRule``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">table_already_exists</span><span class="p">(</span><span class="s2">&quot;shownews_scrapingrule&quot;</span><span class="p">):</span>
+            <span class="n">scraper_utils</span><span class="o">.</span><span class="n">log_warning</span><span class="p">(</span>
+                <span class="s2">&quot;Table &#39;shownews_scrapingrule&#39; does not exists in the database.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">rules_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">get_fields_by_conditions</span><span class="p">(</span>
+            <span class="s2">&quot;shownews_scrapingrule&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,)</span>
+        <span class="p">)</span>
+
+        <span class="n">rules_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">rule_id</span><span class="p">:</span> <span class="n">ScrapingRule</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">rule_name</span><span class="p">,</span> <span class="n">is_active</span><span class="o">=</span><span class="n">is_active</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">rule_id</span><span class="p">,</span> <span class="n">is_active</span><span class="p">,</span> <span class="n">rule_name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">rules_rows</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">rule_id</span><span class="p">,</span> <span class="n">keyword_name</span><span class="p">,</span> <span class="n">to_include</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_keywords_info</span><span class="p">():</span>
+            <span class="n">rules_map</span><span class="p">[</span><span class="n">rule_id</span><span class="p">]</span><span class="o">.</span><span class="n">add_keyword</span><span class="p">(</span><span class="n">keyword_name</span><span class="p">,</span> <span class="n">to_include</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">rule_id</span><span class="p">,</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tags_info</span><span class="p">():</span>
+            <span class="n">rules_map</span><span class="p">[</span><span class="n">rule_id</span><span class="p">]</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tag_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rules_map</span></div>
+
+<div class="viewcode-block" id="NewsDatabaseAPI.remove_all_rules_and_relations"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI.remove_all_rules_and_relations">[docs]</a>    <span class="k">def</span> <span class="nf">remove_all_rules_and_relations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove all scraping rules and relationship with NewsData from DB.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># delete relationships</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;newsdata_rules&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;scoremap&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;scrapingrule_keywords&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;scrapingrule_tags&quot;</span><span class="p">)</span>
+        <span class="c1"># delete rules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;newskeyword&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;newscategory&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;scrapingrule&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NewsDatabaseAPI.reset_news_data"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI.reset_news_data">[docs]</a>    <span class="k">def</span> <span class="nf">reset_news_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove all news data from DB.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_table</span><span class="p">(</span><span class="s2">&quot;newsdata&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NewsDatabaseAPI.store_a_scraping_rule"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI.store_a_scraping_rule">[docs]</a>    <span class="k">def</span> <span class="nf">store_a_scraping_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store a scraping rule into DB.</span>
+
+<span class="sd">        Note that this only stores &lt;rule, keywords, tags&gt; into DB, and does</span>
+<span class="sd">        not handle relationship with NewsRSSEntry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rule (ScrapingRule): The scraping rule to store to DB.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            scraper_utils.NewsScrapperError: If ``rule`` is not instance of ScrapingRule.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">ScrapingRule</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">scraper_utils</span><span class="o">.</span><span class="n">NewsScrapperError</span><span class="p">(</span>
+                <span class="s2">&quot;Parameter &#39;rule&#39; (</span><span class="si">%s</span><span class="s2">) should be an instance of ScrapingRule&quot;</span>
+                <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span><span class="s2">&quot;scrapingrule&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">rule_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_field</span><span class="p">(</span><span class="s2">&quot;scrapingrule&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_store_a_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span><span class="s2">&quot;newscategory&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">included_keywords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_store_a_keyword</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">to_include</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rule_id</span><span class="o">=</span><span class="n">rule_id</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">excluded_keywords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_store_a_keyword</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">to_include</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rule_id</span><span class="o">=</span><span class="n">rule_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NewsDatabaseAPI.store_a_news_data"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI.store_a_news_data">[docs]</a>    <span class="k">def</span> <span class="nf">store_a_news_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">news</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store a news to DB, and setup score and relationships with ScrapingRules.</span>
+
+<span class="sd">        Note that scrapig rules should have exists in DB before this method is called.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            news (NewsRSSEntry): The news to store to DB.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            scraper_utils.NewsScrapperError: If ``news`` is not instance of NewsRSSEntry.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">news</span><span class="p">,</span> <span class="n">NewsRSSEntry</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">scraper_utils</span><span class="o">.</span><span class="n">NewsScrapperError</span><span class="p">(</span>
+                <span class="s2">&quot;Parameter &#39;news&#39; (</span><span class="si">%s</span><span class="s2">) should be an instance of NewsRSSEntry&quot;</span>
+                <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">news</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">curr_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">pytz</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span>
+            <span class="s2">&quot;newsdata&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">news</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">news</span><span class="o">.</span><span class="n">link</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">news</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">news</span><span class="o">.</span><span class="n">published_time</span><span class="p">,</span>
+            <span class="n">creation_time</span><span class="o">=</span><span class="n">curr_time</span><span class="p">,</span>
+            <span class="n">last_modified_time</span><span class="o">=</span><span class="n">curr_time</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">news</span><span class="o">.</span><span class="n">rule_score_map</span><span class="p">:</span>
+            <span class="n">news_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_field</span><span class="p">(</span><span class="s2">&quot;newsdata&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">news</span><span class="o">.</span><span class="n">link</span><span class="p">)</span>
+            <span class="n">rule_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_field</span><span class="p">(</span><span class="s2">&quot;scrapingrule&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">news</span><span class="o">.</span><span class="n">rule_score_map</span><span class="p">[</span><span class="n">rule</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_news_rule_relationship</span><span class="p">(</span><span class="n">news_id</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_keywords_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">keywords_query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;SELECT rule_kw.scrapingrule_id, kw.name, kw.to_include &quot;</span>
+            <span class="s2">&quot;FROM shownews_scrapingrule_keywords AS rule_kw &quot;</span>
+            <span class="s2">&quot;INNER JOIN shownews_newskeyword AS kw &quot;</span>
+            <span class="s2">&quot;ON rule_kw.newskeyword_id = kw.id;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute_sql_command</span><span class="p">(</span><span class="n">keywords_query</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_tags_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tags_query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;SELECT rule_tag.scrapingrule_id, tag.name &quot;</span>
+            <span class="s2">&quot;FROM shownews_scrapingrule_tags AS rule_tag &quot;</span>
+            <span class="s2">&quot;INNER JOIN shownews_newscategory AS tag &quot;</span>
+            <span class="s2">&quot;ON rule_tag.newscategory_id = tag.id;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute_sql_command</span><span class="p">(</span><span class="n">tags_query</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NewsDatabaseAPI.setup_news_rule_relationship"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.db_news_api.NewsDatabaseAPI.setup_news_rule_relationship">[docs]</a>    <span class="k">def</span> <span class="nf">setup_news_rule_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">news_id</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set up score and relationship between a news and a rule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span>
+            <span class="s2">&quot;newsdata_rules&quot;</span><span class="p">,</span>
+            <span class="n">newsdata_id</span><span class="o">=</span><span class="n">news_id</span><span class="p">,</span>
+            <span class="n">scrapingrule_id</span><span class="o">=</span><span class="n">rule_id</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span>
+            <span class="s2">&quot;scoremap&quot;</span><span class="p">,</span>
+            <span class="n">news_id</span><span class="o">=</span><span class="n">news_id</span><span class="p">,</span>
+            <span class="n">rule_id</span><span class="o">=</span><span class="n">rule_id</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="n">score</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_store_a_keyword</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword_name</span><span class="p">,</span> <span class="n">to_include</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">):</span>
+        <span class="c1"># Insert keyword to table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span>
+            <span class="s2">&quot;newskeyword&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">keyword_name</span><span class="p">,</span> <span class="n">to_include</span><span class="o">=</span><span class="n">to_include</span>
+        <span class="p">)</span>
+        <span class="c1"># Get id from DB</span>
+        <span class="n">keyword_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_field</span><span class="p">(</span>
+            <span class="s2">&quot;newskeyword&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">keyword_name</span><span class="p">,</span> <span class="n">to_include</span><span class="o">=</span><span class="n">to_include</span>
+        <span class="p">)</span>
+        <span class="c1"># Setup relationship to ScrapingRule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span>
+            <span class="s2">&quot;scrapingrule_keywords&quot;</span><span class="p">,</span>
+            <span class="n">scrapingrule_id</span><span class="o">=</span><span class="n">rule_id</span><span class="p">,</span>
+            <span class="n">newskeyword_id</span><span class="o">=</span><span class="n">keyword_id</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_store_a_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">):</span>
+        <span class="c1"># Insert the tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span><span class="s2">&quot;newscategory&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">tag_name</span><span class="p">)</span>
+        <span class="c1"># Get id from DB</span>
+        <span class="n">tag_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_field</span><span class="p">(</span>
+            <span class="s2">&quot;newscategory&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">tag_name</span>
+        <span class="p">)</span>
+        <span class="c1"># Setup relationship to ScrapingRule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_data_into_table</span><span class="p">(</span>
+            <span class="s2">&quot;scrapingrule_tags&quot;</span><span class="p">,</span>
+            <span class="n">scrapingrule_id</span><span class="o">=</span><span class="n">rule_id</span><span class="p">,</span>
+            <span class="n">newscategory_id</span><span class="o">=</span><span class="n">tag_id</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_id_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_table_prefix</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">get_fields_by_conditions</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,),</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">scraper_utils</span><span class="o">.</span><span class="n">NewsScrapperError</span><span class="p">(</span>
+                <span class="s2">&quot;Can not get entry id from table &#39;</span><span class="si">{}</span><span class="s2">&#39; with condition </span><span class="si">{}</span><span class="s2">.&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_reset_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_table_prefix</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">reset_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_insert_data_into_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_table_prefix</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">insert_values_into_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;duplicate key value violates unique constraint&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+    <span class="k">def</span> <span class="nf">_update_table_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">args_map</span><span class="p">,</span> <span class="n">conditions</span><span class="p">):</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_table_prefix</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">update_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">args_map</span><span class="p">,</span> <span class="n">conditions</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_table_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_prefix</span> <span class="o">+</span> <span class="n">table_name</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, gn01842919.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

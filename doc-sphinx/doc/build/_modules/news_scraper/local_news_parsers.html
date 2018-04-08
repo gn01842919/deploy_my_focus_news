@@ -1,0 +1,448 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>news_scraper.local_news_parsers &#8212; my_focus_news  documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for news_scraper.local_news_parsers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module contains tools to parse a news link to extract news content.</span>
+
+<span class="sd">Purpose:</span>
+<span class="sd">    Google RSS News collects news from local news sources, such as:</span>
+<span class="sd">      - [自由時報電子報]</span>
+<span class="sd">        http://news.ltn.com.tw/</span>
+<span class="sd">      - [新頭殼]</span>
+<span class="sd">        https://newtalk.tw/</span>
+<span class="sd">      - [中央廣播電台]</span>
+<span class="sd">        https://news.rti.org.tw/</span>
+
+<span class="sd">    But it does not contain the news content in the RSS feed itself.</span>
+<span class="sd">    The purpose of this module is to grab the news content from</span>
+<span class="sd">    the actual news source.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    _PARSER_REGISTRY (dict): Maps domain names to local news parsers.</span>
+<span class="sd">        &lt;Key&gt;: The domain name of the local news source.</span>
+<span class="sd">        &lt;Value&gt;: The local news parser class.</span>
+
+<span class="sd">        When writing a class that inherits the base class ``HtmlNewsParser``,</span>
+<span class="sd">        it is registered in ``_PARSER_REGISTRY`` automatically.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># Standard library</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">urlopen</span>
+<span class="c1"># PyPI</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
+<span class="c1"># Local modules</span>
+<span class="kn">import</span> <span class="nn">scraper_utils</span>
+
+<span class="n">_PARSER_REGISTRY</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="update_local_news_sources_list"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.update_local_news_sources_list">[docs]</a><span class="k">def</span> <span class="nf">update_local_news_sources_list</span><span class="p">(</span><span class="n">news_entries</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function maintains a list of possible local news sources to a file.</span>
+
+<span class="sd">    Note that this is not necessarily.</span>
+<span class="sd">    This purpose is to know whether there are common local news websites</span>
+<span class="sd">    whose parsers are not yet implemented.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        news_entries (Iterable(scraper_models.NewsRSSEntry)): News eitries</span>
+<span class="sd">            to extract the news source websites from.</span>
+
+<span class="sd">        filename (str): The name of the file to store the updated list</span>
+<span class="sd">            and to read the current list from.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">local_news_sources</span> <span class="o">=</span> <span class="n">scraper_utils</span><span class="o">.</span><span class="n">read_json_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">news_entries</span><span class="p">:</span>
+        <span class="n">news_hostname</span> <span class="o">=</span> <span class="n">scraper_utils</span><span class="o">.</span><span class="n">extract_domain_name_from_url</span><span class="p">(</span><span class="n">news</span><span class="o">.</span><span class="n">link</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">news_hostname</span> <span class="ow">in</span> <span class="n">local_news_sources</span><span class="p">:</span>
+            <span class="n">local_news_sources</span><span class="p">[</span><span class="n">news_hostname</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">local_news_sources</span><span class="p">[</span><span class="n">news_hostname</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Sort the dict &quot;local_news_sources&quot; by values</span>
+    <span class="n">sorted_local_news_sources</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+        <span class="nb">sorted</span><span class="p">(</span><span class="n">local_news_sources</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">sorted_local_news_sources</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_local_parser_registry"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.get_local_parser_registry">[docs]</a><span class="k">def</span> <span class="nf">get_local_parser_registry</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Get the dict mapping domain names to local news parsers.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A copy of ``_PARSER_REGISTRY``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_PARSER_REGISTRY</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">_register_local_source</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+    <span class="n">_PARSER_REGISTRY</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
+
+
+<div class="viewcode-block" id="LocalNewsMeta"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.LocalNewsMeta">[docs]</a><span class="k">class</span> <span class="nc">LocalNewsMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Meta class for ``HtmlNewsParser`` to register subclasses.</span>
+
+<span class="sd">    To register &lt;domain_name, parser_class&gt; mappings to ``_PARSER_REGISTRY``.</span>
+
+<span class="sd">    Note that the base class itself will not be registered.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">)</span>
+
+        <span class="c1"># Skip the (abstract) base class (HtmlNewsParser)</span>
+        <span class="k">if</span> <span class="n">bases</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
+            <span class="k">for</span> <span class="n">domain_name</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">source_base_urls</span><span class="p">:</span>
+                <span class="n">_register_local_source</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span></div>
+
+
+<div class="viewcode-block" id="HtmlNewsParser"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.HtmlNewsParser">[docs]</a><span class="k">class</span> <span class="nc">HtmlNewsParser</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">LocalNewsMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for local news parsers.</span>
+
+<span class="sd">    Subclasses of this class are registered to ``_PARSER_REGISTRY``.</span>
+<span class="sd">    Note that this class can not be instanciated by metaclass ``LocalNewsMeta``.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        source_base_urls (list(str)): Domain names for the local news source.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">source_base_urls</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="HtmlNewsParser.get_news_content_from_url"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.HtmlNewsParser.get_news_content_from_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_news_content_from_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get news content from the local news source.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The link of the local news.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: News content of the local news.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_news_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">ancestor_tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">dict_ancestor_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get news content from url.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The link of the local news.</span>
+
+<span class="sd">            ancestor_tag (str): The html tag in which the news content lies.</span>
+
+<span class="sd">            dict_ancestor_attr (dict, optional): Attributes of the target</span>
+<span class="sd">                 ``ancestor_tag``. Defaults to None.</span>
+
+<span class="sd">            raise_error (bool, optional): Whether to raise AttributeError</span>
+<span class="sd">                when fail to find the target ``ancestor_tag``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: News content of the local news.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If fail to find the target ``ancestor_tag`` and</span>
+<span class="sd">                ``raise_error`` is set to True.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            news_content = get_news_content(</span>
+<span class="sd">                    url, &quot;div&quot;, {&quot;class&quot;: &quot;article&quot;}, raise_error=True</span>
+<span class="sd">                )</span>
+
+<span class="sd">            This will try to find the tag ``&lt;div class=&quot;article&quot;&gt;``, and</span>
+<span class="sd">            retrieve the news content inside the tag.</span>
+
+<span class="sd">            If not ``ancestor_tag`` is assigned, this method will try to</span>
+<span class="sd">            find ``&lt;meta name=&quot;description&quot; content=&quot;......&quot;&gt;`` and retrieve</span>
+<span class="sd">            the news content from it.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ancestor_tag</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content_by_default</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">news_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content_by_p_tags</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">ancestor_tag</span><span class="p">,</span> <span class="n">dict_ancestor_attr</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+                <span class="k">raise</span>  <span class="c1"># So that the caller can handle the AttributeError</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;Try to get news content by &lt;p&gt; tags inside &lt;</span><span class="si">%s</span><span class="s2">&gt; from [</span><span class="si">%s</span><span class="s2">], but fail. &quot;</span>
+                <span class="s2">&quot;Maybe the html content of the local news source has been changed.&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">ancestor_tag</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">scraper_utils</span><span class="o">.</span><span class="n">log_warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">news_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content_by_default</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">news_content</span>
+
+    <span class="k">def</span> <span class="nf">_get_news_content_by_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">news_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content_by_meta_name</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">news_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content_by_meta_name</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;Description&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Try to get news content by meta description from [</span><span class="si">%s</span><span class="s2">], but fail.&quot;</span>
+                    <span class="o">%</span> <span class="n">url</span>
+                <span class="p">)</span>
+                <span class="n">scraper_utils</span><span class="o">.</span><span class="n">log_warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="c1"># news_content = self._get_beautifulsoup_obj(url).get_text()</span>
+                <span class="n">news_content</span> <span class="o">=</span> <span class="s2">&quot;&lt;Fail to get news_content&gt;&quot;</span>
+
+        <span class="k">return</span> <span class="n">news_content</span>
+
+    <span class="k">def</span> <span class="nf">_get_news_content_by_p_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">ancestor_tag</span><span class="p">,</span> <span class="n">dict_ancestor_attr</span><span class="p">):</span>
+
+        <span class="n">bsobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_beautifulsoup_obj</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="n">paragraphs</span> <span class="o">=</span> <span class="n">bsobj</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">ancestor_tag</span><span class="p">,</span> <span class="n">dict_ancestor_attr</span><span class="p">)</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paragraphs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_news_content_by_meta_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">meta_name</span><span class="p">):</span>
+        <span class="n">bsobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_beautifulsoup_obj</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="n">description_in_meta</span> <span class="o">=</span> <span class="n">bsobj</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">meta_name</span><span class="p">})[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">description_in_meta</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">description_in_meta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">description_in_meta</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;Get empty or non-string news content by meta &#39;</span><span class="si">%s</span><span class="s2">&#39; from [</span><span class="si">%s</span><span class="s2">]. &quot;</span>
+                <span class="s2">&quot;Currently null string is returned as a workaround.&quot;</span>
+                <span class="o">%</span> <span class="n">url</span>
+            <span class="p">)</span>
+            <span class="n">scraper_utils</span><span class="o">.</span><span class="n">log_warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_beautifulsoup_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+
+        <span class="c1"># check whether the URL belong to this local news source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># May raise HTTPError, URLError</span>
+        <span class="c1"># Should be handled by caller</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">bsobj</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">bsobj</span>
+
+    <span class="k">def</span> <span class="nf">_check_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+
+        <span class="n">target_base_url</span> <span class="o">=</span> <span class="n">scraper_utils</span><span class="o">.</span><span class="n">extract_domain_name_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># source is generally shorter or equal to target_base_url</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">source</span> <span class="ow">in</span> <span class="n">target_base_url</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">source_base_urls</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">scraper_utils</span><span class="o">.</span><span class="n">NewsScrapperError</span><span class="p">(</span>
+                <span class="s2">&quot;URL [</span><span class="si">%s</span><span class="s2">] does not match any of base_urls: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">source_base_urls</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DefaultHtmlNewsParser"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.DefaultHtmlNewsParser">[docs]</a><span class="k">class</span> <span class="nc">DefaultHtmlNewsParser</span><span class="p">(</span><span class="n">HtmlNewsParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parser for local news sources whose html_parser is not yet implemented.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_check_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="LtnHtmlNewsParser"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.LtnHtmlNewsParser">[docs]</a><span class="k">class</span> <span class="nc">LtnHtmlNewsParser</span><span class="p">(</span><span class="n">HtmlNewsParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parser for the local news source &quot;自由時報 (LTN)&quot;.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        source_base_urls (list(str)): Posible domain names for this local news source.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">source_base_urls</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ltn.com.tw&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LtnHtmlNewsParser.get_news_content_from_url"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.LtnHtmlNewsParser.get_news_content_from_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_news_content_from_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get news content from the news link.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The link of the local news.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: News content of the local news.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ltn has many common html formats...</span>
+        <span class="n">possible_class_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;news_content&quot;</span><span class="p">,</span> <span class="s2">&quot;boxTitle&quot;</span><span class="p">,</span> <span class="s2">&quot;conbox&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">class_name</span> <span class="ow">in</span> <span class="n">possible_class_names</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">class_name</span><span class="p">},</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># The last one should not have to raise Attrubute errors, so handle it seperately.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">possible_class_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>  <span class="c1"># No &#39;raise_error=True&#39; here</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CnaHtmlNewsParser"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.CnaHtmlNewsParser">[docs]</a><span class="k">class</span> <span class="nc">CnaHtmlNewsParser</span><span class="p">(</span><span class="n">HtmlNewsParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parser for the local news source &quot;中央通訊社 (CNA)&quot;.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        source_base_urls (list(str)): Posible domain names for this local news source.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">source_base_urls</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cna.com.tw&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CnaHtmlNewsParser.get_news_content_from_url"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.CnaHtmlNewsParser.get_news_content_from_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_news_content_from_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get news content from the news link.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The link of the local news.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: News content of the local news.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;article_box&quot;</span><span class="p">})</span></div></div>
+
+
+<div class="viewcode-block" id="UdnHtmlNewsParser"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.UdnHtmlNewsParser">[docs]</a><span class="k">class</span> <span class="nc">UdnHtmlNewsParser</span><span class="p">(</span><span class="n">HtmlNewsParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parser for the local news source &quot;聯合新聞網 (UDN)&quot;.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        source_base_urls (list(str)): Posible domain names for this local news source.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">source_base_urls</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;udn.com&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="UdnHtmlNewsParser.get_news_content_from_url"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.UdnHtmlNewsParser.get_news_content_from_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_news_content_from_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get news content from the news link.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The link of the local news.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: News content of the local news.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;story_body_content&quot;</span><span class="p">})</span></div></div>
+
+
+<div class="viewcode-block" id="EtodayHtmlNewsParser"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.EtodayHtmlNewsParser">[docs]</a><span class="k">class</span> <span class="nc">EtodayHtmlNewsParser</span><span class="p">(</span><span class="n">HtmlNewsParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parser for the local news source &quot;ETtoday 新聞雲&quot;.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        source_base_urls (list(str)): Posible domain names for this local news source.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">source_base_urls</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ettoday.net&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="EtodayHtmlNewsParser.get_news_content_from_url"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.local_news_parsers.EtodayHtmlNewsParser.get_news_content_from_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_news_content_from_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get news content from the news link.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The link of the local news.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: News content of the local news.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_news_content</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;story&quot;</span><span class="p">})</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, gn01842919.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

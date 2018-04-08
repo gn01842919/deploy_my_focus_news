@@ -1,0 +1,251 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>news_scraper.scraper_utils &#8212; my_focus_news  documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for news_scraper.scraper_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Common utilities used by other modules.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    log_format (str): default log format.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">DEFAULT_LOG_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">%(levelname)s</span><span class="s1">] [</span><span class="si">%(asctime)s</span><span class="s1">] </span><span class="si">%(message)s</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+
+<div class="viewcode-block" id="log_warning"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.scraper_utils.log_warning">[docs]</a><span class="k">def</span> <span class="nf">log_warning</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">is_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Log warnings or errors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        msg (str): Error message to log.</span>
+<span class="sd">        is_error (bool, optional): True to log as an error, and</span>
+<span class="sd">            False (default) to log as a warning.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        NewsScrapperError: If a logger with name &#39;error_log&#39; has not been set up.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;error_log&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">loggerDict</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NewsScrapperError</span><span class="p">(</span><span class="s2">&quot;Please set up &#39;error_log&#39; logger first.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_error</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;error_log&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;error_log&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="setup_logger"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.scraper_utils.setup_logger">[docs]</a><span class="k">def</span> <span class="nf">setup_logger</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="n">logfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">to_console</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">log_format</span><span class="o">=</span><span class="n">DEFAULT_LOG_FORMAT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set up ``logging.logger``</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name of the logger to set up.</span>
+
+<span class="sd">        level (int, optional): Default to logging.DEBUG.</span>
+
+<span class="sd">        logfile (str, optional): Filename of the error log file.</span>
+<span class="sd">            If specified, the error message will be written to the file.</span>
+<span class="sd">            Defaults to None.</span>
+
+<span class="sd">        to_console (bool, optional): Whether to log message to standard output.</span>
+<span class="sd">            Defaults to True.</span>
+
+<span class="sd">        log_format (str, optional): The log format. Default to ``DEFAULT_LOG_FORMAT``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        logging.Logger: The logger object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">log_format</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">logfile</span><span class="p">:</span>
+        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">to_console</span><span class="p">:</span>
+        <span class="n">console</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">logger</span></div>
+
+
+<div class="viewcode-block" id="extract_domain_name_from_url"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.scraper_utils.extract_domain_name_from_url">[docs]</a><span class="k">def</span> <span class="nf">extract_domain_name_from_url</span><span class="p">(</span><span class="n">link</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract the domain name from a url.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        link (str): A url.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The domain name in the url.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_url_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;^https?://([a-zA-Z0-9.-]+)/&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">base_url_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">link</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;www.&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">log_warning</span><span class="p">(</span>
+            <span class="s1">&#39;News link [</span><span class="si">%s</span><span class="s1">] does not match base_url_pattern.&#39;</span> <span class="o">%</span> <span class="n">link</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_json_from_file"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.scraper_utils.read_json_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_json_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read data in JSON format from file.</span>
+
+<span class="sd">    If the file does not exist yet, create an empty one, and return an empty dict.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): Name of the input file to read.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A JSON (dict) object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="n">log_warning</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">%s</span><span class="s2">&#39; not found.&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Fail to parse the content of file &#39;</span><span class="si">%s</span><span class="s2">&#39; as JSON. &quot;</span> <span class="o">%</span> <span class="n">filename</span>
+        <span class="n">log_warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="NewsScrapperError"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.scraper_utils.NewsScrapperError">[docs]</a><span class="k">class</span> <span class="nc">NewsScrapperError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Basic Error for the ``news_scraper`` project.</span>
+
+<span class="sd">    Error messages are logged to ``logging.getLogger(&#39;error_log&#39;)``</span>
+<span class="sd">        with the ``logging.error()`` method.</span>
+
+<span class="sd">    If the logger is not set, write msg to both stdout and a file named &#39;error.log&#39;.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        logger (logging.Logger): The logger named &#39;error_log&#39;.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        msg (str): Error message to log.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">setup_error_logger</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NewsScrapperError.setup_error_logger"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.scraper_utils.NewsScrapperError.setup_error_logger">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">setup_error_logger</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set up logger for error log</span>
+
+<span class="sd">        If a logger with name &#39;error_log&#39; does not exist yet, set it up.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;error_log&#39;</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">loggerDict</span><span class="p">:</span>
+            <span class="c1"># The logger of name &#39;error_log&#39; has been setup maybe by other modules.</span>
+            <span class="c1"># Use the already existing one.</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;error_log&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">setup_logger</span><span class="p">(</span>
+                <span class="s1">&#39;error_log&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">logfile</span><span class="o">=</span><span class="s1">&#39;error.log&#39;</span><span class="p">,</span> <span class="n">to_console</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, gn01842919.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

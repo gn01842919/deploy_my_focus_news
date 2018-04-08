@@ -1,0 +1,1098 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>news_scraper package &#8212; my_focus_news  documentation</title>
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="news_scraper.db_operation_api package" href="news_scraper.db_operation_api.html" />
+    <link rel="prev" title="Welcome to my_focus_news’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="news_scraper.db_operation_api.html" title="news_scraper.db_operation_api package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to my_focus_news’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">my_focus_news  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">news_scraper package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-news_scraper.settings">news_scraper.settings module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.schedule">news_scraper.schedule module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.collect_news_to_db">news_scraper.collect_news_to_db module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.remove_all_data_from_db">news_scraper.remove_all_data_from_db module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.scraper_models">news_scraper.scraper_models module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.news_sources">news_scraper.news_sources module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.rss_feed_parsers">news_scraper.rss_feed_parsers module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.local_news_parsers">news_scraper.local_news_parsers module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.scraping_rules_reader">news_scraper.scraping_rules_reader module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.scraper_utils">news_scraper.scraper_utils module</a></li>
+<li><a class="reference internal" href="#module-news_scraper.db_news_api">news_scraper.db_news_api module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to my_focus_news’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="news_scraper.db_operation_api.html"
+                        title="next chapter">news_scraper.db_operation_api package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/news_scraper.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="news-scraper-package">
+<h1>news_scraper package<a class="headerlink" href="#news-scraper-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="news_scraper.db_operation_api.html">news_scraper.db_operation_api package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="news_scraper.db_operation_api.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="news_scraper.db_operation_api.html#module-news_scraper.db_operation_api.mydb">news_scraper.db_operation_api.mydb module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="news_scraper.tests.html">news_scraper.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="news_scraper.tests.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="news_scraper.tests.unit_tests.html">news_scraper.tests.unit_tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="news_scraper.tests.unit_tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="news_scraper.tests.unit_tests.html#module-news_scraper.tests.unit_tests.test_rss_parsers">news_scraper.tests.unit_tests.test_rss_parsers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="news_scraper.tests.unit_tests.html#module-news_scraper.tests.unit_tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="news_scraper.tests.html#module-news_scraper.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-news_scraper.settings">
+<span id="news-scraper-settings-module"></span><h2>news_scraper.settings module<a class="headerlink" href="#module-news_scraper.settings" title="Permalink to this headline">¶</a></h2>
+<p>Configurations of the <code class="docutils literal notranslate"><span class="pre">news_scraper</span></code> package.</p>
+</div>
+<div class="section" id="module-news_scraper.schedule">
+<span id="news-scraper-schedule-module"></span><h2>news_scraper.schedule module<a class="headerlink" href="#module-news_scraper.schedule" title="Permalink to this headline">¶</a></h2>
+<p>Schedule when to collect news (by collect_news_to_db.py).</p>
+<p>If execute directly, will collect news immediately, and then periodically collects news.</p>
+<p class="rubric">Example</p>
+<p>This module can be executed directly:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> python schedule.py
+</pre></div>
+</div>
+<dl class="function">
+<dt id="news_scraper.schedule.schedule_once_an_hour">
+<code class="descclassname">news_scraper.schedule.</code><code class="descname">schedule_once_an_hour</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/schedule.html#schedule_once_an_hour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.schedule.schedule_once_an_hour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run scrape_news_and_save_to_db() once an hour.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.collect_news_to_db">
+<span id="news-scraper-collect-news-to-db-module"></span><h2>news_scraper.collect_news_to_db module<a class="headerlink" href="#module-news_scraper.collect_news_to_db" title="Permalink to this headline">¶</a></h2>
+<p>This module collects news, filter them by rules, and store them to DB.</p>
+<p class="rubric">Example</p>
+<p>This module can be executed directly:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> python collect_news_to_db.py
+</pre></div>
+</div>
+<dl class="function">
+<dt id="news_scraper.collect_news_to_db.scrape_news_and_save_to_db">
+<code class="descclassname">news_scraper.collect_news_to_db.</code><code class="descname">scrape_news_and_save_to_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/collect_news_to_db.html#scrape_news_and_save_to_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.collect_news_to_db.scrape_news_and_save_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect news, filter them by rules, and store them to DB.</p>
+<dl class="docutils">
+<dt>This method does the following:</dt>
+<dd><ol class="first last arabic simple">
+<li>Read scraping rules from file.</li>
+<li>Read scraping rules from DB.</li>
+<li>If rules have changed, update the the rules in DB by rules from file.</li>
+<li>Retrieve news data from RSS news links.</li>
+<li>Filter the news by scraping rules, and save the result to DB.</li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.remove_all_data_from_db">
+<span id="news-scraper-remove-all-data-from-db-module"></span><h2>news_scraper.remove_all_data_from_db module<a class="headerlink" href="#module-news_scraper.remove_all_data_from_db" title="Permalink to this headline">¶</a></h2>
+<p>Remove all data from the database created by <code class="docutils literal notranslate"><span class="pre">news_scraper</span></code>”.</p>
+<p class="rubric">Example</p>
+<p>This module can be executed directly:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> python remove_all_data_from_db.py
+</pre></div>
+</div>
+<dl class="function">
+<dt id="news_scraper.remove_all_data_from_db.main">
+<code class="descclassname">news_scraper.remove_all_data_from_db.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/remove_all_data_from_db.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.remove_all_data_from_db.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all data created by <code class="docutils literal notranslate"><span class="pre">news_scraper</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.scraper_models">
+<span id="news-scraper-scraper-models-module"></span><h2>news_scraper.scraper_models module<a class="headerlink" href="#module-news_scraper.scraper_models" title="Permalink to this headline">¶</a></h2>
+<p>This module contains common data structures used in the package.</p>
+<p>The reason is that this modules contains data structures that
+are proper to break the conventions in my opinion.</p>
+<dl class="class">
+<dt id="news_scraper.scraper_models.NewsRSSEntry">
+<em class="property">class </em><code class="descclassname">news_scraper.scraper_models.</code><code class="descname">NewsRSSEntry</code><span class="sig-paren">(</span><em>title</em>, <em>description</em>, <em>link</em>, <em>published_time</em>, <em>source</em>, <em>category=None</em>, <em>tags=None</em>, <em>rules=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_models.html#NewsRSSEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_models.NewsRSSEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Data structure representing a news entry in a RSS feed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>str</em>) – Title of the news.</li>
+<li><strong>description</strong> (<em>str</em>) – Context or excerpt of the news.</li>
+<li><strong>link</strong> (<em>str</em>) – Url of the news.</li>
+<li><strong>published_time</strong> (<em>datetime.datetime</em>) – Published time of the news.</li>
+<li><strong>source</strong> (<em>str</em>) – The news source (google or yahoo).</li>
+<li><strong>category</strong> (<em>str, optional</em>) – Category of this news. Defaults to None.
+This will be added to <code class="docutils literal notranslate"><span class="pre">self.tags</span></code>.</li>
+<li><strong>tags</strong> (<em>set, optional</em>) – Tags of the news. Defaults to None.</li>
+<li><strong>rules</strong> (<em>Iterable, optional</em>) – ScrapingRules related to this news.
+Defaults to None.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="news_scraper.scraper_models.NewsRSSEntry.set_rules">
+<code class="descname">set_rules</code><span class="sig-paren">(</span><em>rules</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_models.html#NewsRSSEntry.set_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_models.NewsRSSEntry.set_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set scraping_rules to this news.</p>
+<dl class="docutils">
+<dt>This method does:</dt>
+<dd><ol class="first last arabic simple">
+<li>computes scores which represents the relevance between
+the rule and the news.</li>
+<li>Constructs <code class="docutils literal notranslate"><span class="pre">self.rule_score_map</span></code> which maps a rule to a score.</li>
+<li>Set up <code class="docutils literal notranslate"><span class="pre">self.tags</span></code> with related (whose score is greater than 0) rules.</li>
+</ol>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rules</strong> (<em>Iterable(ScrapingRule)</em>) – list of scraping_rules to decide whether</li>
+<li><strong>this news is of interested according to the rule.</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="news_scraper.scraper_models.NewsRSSEntry.total_score">
+<code class="descname">total_score</code><a class="headerlink" href="#news_scraper.scraper_models.NewsRSSEntry.total_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum of positive scores of all rules.</p>
+<p>Note that negative scores are excluded.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.scraper_models.RssFeed">
+<em class="property">class </em><code class="descclassname">news_scraper.scraper_models.</code><code class="descname">RssFeed</code><span class="sig-paren">(</span><em>title</em>, <em>subtitle</em>, <em>link</em>, <em>language</em>, <em>published_time</em>, <em>entries</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_models.html#RssFeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_models.RssFeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Data structure containing information of a RSS feed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>str</em>) – Title of the feed.</li>
+<li><strong>subtitle</strong> (<em>str</em>) – Subtitle of the feed.</li>
+<li><strong>link</strong> (<em>str</em>) – Url of the feed.</li>
+<li><strong>language</strong> (<em>str</em>) – Language of the feed.</li>
+<li><strong>published_time</strong> (<em>datetime.datetime</em>) – Published time of the feed.</li>
+<li><strong>entries</strong> (<em>tuple(NewsRSSEntry)</em>) – News entries in this feed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.scraper_models.ScrapingRule">
+<em class="property">class </em><code class="descclassname">news_scraper.scraper_models.</code><code class="descname">ScrapingRule</code><span class="sig-paren">(</span><em>name</em>, <em>included_keywords=None</em>, <em>excluded_keywords=None</em>, <em>tags=None</em>, <em>is_active=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_models.html#ScrapingRule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_models.ScrapingRule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Data structure representing a rule to decide whether a news is of interest.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – Name of the rule.</li>
+<li><strong>included_keywords</strong> (<em>set(str)</em>) – Keywords used to judge if a news is of interest.
+If a news contains any keyword in <code class="docutils literal notranslate"><span class="pre">included_keywords</span></code>, the news is
+possibly of intereste.</li>
+<li><strong>excluded_keywords</strong> (<em>set(str)</em>) – Keywords used to decide that a news is
+“not of interest”.</li>
+<li><strong>tags</strong> (<em>set(str)</em>) – The tag to attach to the news if a rule decides that
+a news is of interested (score &gt; 0).</li>
+<li><strong>is_active</strong> (<em>bool, optional</em>) – Whether this rule is active. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="news_scraper.scraper_models.ScrapingRule.add_keyword">
+<code class="descname">add_keyword</code><span class="sig-paren">(</span><em>keyword_name</em>, <em>to_include</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_models.html#ScrapingRule.add_keyword"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_models.ScrapingRule.add_keyword" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a keyword to this rule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>keyword_name</strong> (<em>str</em>) – The keyword to add.</li>
+<li><strong>to_include</strong> (<em>bool</em>) – If True, this keyword is of “included_keywords”.
+Otherwise, it is of “excluded_keywords”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.news_sources">
+<span id="news-scraper-news-sources-module"></span><h2>news_scraper.news_sources module<a class="headerlink" href="#module-news_scraper.news_sources" title="Permalink to this headline">¶</a></h2>
+<p>RSS news sources are written as code in this module.</p>
+<dl class="attribute">
+<dt id="news_scraper.news_sources._NEWS_SOURCE_REGISTRY">
+<code class="descclassname">news_scraper.news_sources.</code><code class="descname">_NEWS_SOURCE_REGISTRY</code><a class="headerlink" href="#news_scraper.news_sources._NEWS_SOURCE_REGISTRY" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – Registry of news sources.
+&lt;Key&gt;: Name of the class.
+&lt;Value&gt;: The news source class.</p>
+<p>When writing a class that inherits the base class <code class="docutils literal notranslate"><span class="pre">NewsSource</span></code>,
+it is registered in <code class="docutils literal notranslate"><span class="pre">_NEWS_SOURCE_REGISTRY</span></code> automatically.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.news_sources.GoogleNews">
+<em class="property">class </em><code class="descclassname">news_scraper.news_sources.</code><code class="descname">GoogleNews</code><a class="reference internal" href="_modules/news_scraper/news_sources.html#GoogleNews"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.GoogleNews" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.news_sources.NewsSource" title="news_scraper.news_sources.NewsSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.news_sources.NewsSource</span></code></a></p>
+<p>Google RSS news sources.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>base_url</strong> (<em>str</em>) – Base url for Google RSS news sources.</li>
+<li><strong>categories</strong> (<em>list(str)</em>) – Categories of Google RSS news sources.
+Each category corresponds to a RSS news source.</li>
+<li><strong>rss_map</strong> (<em>dict</em>) – Key: A category. Value: URL of the RSS news source of the category.</li>
+<li><strong>feed_parser</strong> (<em>rss_feed_parsers.GoogleFeedParser</em>) – The feed parser to parse RSS feeds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.news_sources.NewsMeta">
+<em class="property">class </em><code class="descclassname">news_scraper.news_sources.</code><code class="descname">NewsMeta</code><a class="reference internal" href="_modules/news_scraper/news_sources.html#NewsMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.NewsMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></p>
+<p>Meta class for <code class="docutils literal notranslate"><span class="pre">NewsSource</span></code> to register subclasses.</p>
+<p>To register classes except the base class to <code class="docutils literal notranslate"><span class="pre">_NEWS_SOURCE_REGISTRY</span></code>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.news_sources.NewsSource">
+<em class="property">class </em><code class="descclassname">news_scraper.news_sources.</code><code class="descname">NewsSource</code><a class="reference internal" href="_modules/news_scraper/news_sources.html#NewsSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.NewsSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for news sources.</p>
+<p>Subclasses of this class are registered to <code class="docutils literal notranslate"><span class="pre">_NEWS_SOURCE_REGISTRY</span></code>.
+Note that this class can not be instanciated.</p>
+<dl class="method">
+<dt id="news_scraper.news_sources.NewsSource.get_raw_feed_object">
+<code class="descname">get_raw_feed_object</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/news_sources.html#NewsSource.get_raw_feed_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.NewsSource.get_raw_feed_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get feed oject given a category of the RSS source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>category</strong> (<em>str</em>) – Which category of the RSS source to retrieve.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> –<dl class="docutils">
+<dt>A dictionary representing the RSS feed.</dt>
+<dd>For more details, please refer to <a class="reference external" href="https://pythonhosted.org/feedparser/introduction.html">feedparser documentation</a></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.news_sources.NewsSource.get_rss_url">
+<code class="descname">get_rss_url</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/news_sources.html#NewsSource.get_rss_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.NewsSource.get_rss_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the link of a RSS feed specified by <code class="docutils literal notranslate"><span class="pre">category</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.news_sources.NewsSource.parse_feed">
+<code class="descname">parse_feed</code><span class="sig-paren">(</span><em>raw_feed</em>, <em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/news_sources.html#NewsSource.parse_feed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.NewsSource.parse_feed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a raw RSS feed and extract necessary information.</p>
+<p>Note that this will call <code class="docutils literal notranslate"><span class="pre">rss_feed_parsers.RSSFeedParser.parse_feed</span></code>,
+which will process news entries in the feed by a thread pool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>raw_feed</strong> (<em>dict</em>) – The return value of <code class="docutils literal notranslate"><span class="pre">self.get_raw_feed_object(category)</span></code>.</li>
+<li><strong>category</strong> (<em>str</em>) – The category of the RSS source to parse.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>scraper_models.RssFeed</em> – A class that contains only interested fields of a RSS feed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.news_sources.YahooNews">
+<em class="property">class </em><code class="descclassname">news_scraper.news_sources.</code><code class="descname">YahooNews</code><a class="reference internal" href="_modules/news_scraper/news_sources.html#YahooNews"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.YahooNews" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.news_sources.NewsSource" title="news_scraper.news_sources.NewsSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.news_sources.NewsSource</span></code></a></p>
+<p>Yahoo RSS news sources.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>base_url</strong> (<em>str</em>) – Base url for Yahoo RSS news sources.</li>
+<li><strong>categories</strong> (<em>list(str)</em>) – Categories of Yahoo RSS news sources.
+Each category corresponds to a RSS news source.</li>
+<li><strong>rss_map</strong> (<em>dict</em>) – Key: A category. Value: URL of the RSS news source of the category.</li>
+<li><strong>feed_parser</strong> (<em>rss_feed_parsers.YahooFeedParser</em>) – The feed parser to parse RSS feeds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.news_sources.get_news_source_registry">
+<code class="descclassname">news_scraper.news_sources.</code><code class="descname">get_news_source_registry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/news_sources.html#get_news_source_registry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.news_sources.get_news_source_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get registered news source classes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – A copy of <code class="docutils literal notranslate"><span class="pre">_NEWS_SOURCE_REGISTRY</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.rss_feed_parsers">
+<span id="news-scraper-rss-feed-parsers-module"></span><h2>news_scraper.rss_feed_parsers module<a class="headerlink" href="#module-news_scraper.rss_feed_parsers" title="Permalink to this headline">¶</a></h2>
+<p>This module defines parsers to parse RSS feeds.</p>
+<dl class="class">
+<dt id="news_scraper.rss_feed_parsers.GoogleFeedParser">
+<em class="property">class </em><code class="descclassname">news_scraper.rss_feed_parsers.</code><code class="descname">GoogleFeedParser</code><a class="reference internal" href="_modules/news_scraper/rss_feed_parsers.html#GoogleFeedParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.rss_feed_parsers.GoogleFeedParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.rss_feed_parsers.RSSFeedParser" title="news_scraper.rss_feed_parsers.RSSFeedParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.rss_feed_parsers.RSSFeedParser</span></code></a></p>
+<p>RSS feed parser for Google RSS news sources.</p>
+<p>Note that the description of news entries of Google RSS sources does not
+contain the news content, but contains urls of local news sources.</p>
+<p>So <code class="docutils literal notranslate"><span class="pre">self._get_description()</span></code> is overridden to parse the local news
+sources to the the news content.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.rss_feed_parsers.RSSFeedParser">
+<em class="property">class </em><code class="descclassname">news_scraper.rss_feed_parsers.</code><code class="descname">RSSFeedParser</code><a class="reference internal" href="_modules/news_scraper/rss_feed_parsers.html#RSSFeedParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.rss_feed_parsers.RSSFeedParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for RSS feed parsers.</p>
+<p>Can be instanciated directly, while it is recommended to inherit from this class.</p>
+<dl class="classmethod">
+<dt id="news_scraper.rss_feed_parsers.RSSFeedParser.parse_feed">
+<em class="property">classmethod </em><code class="descname">parse_feed</code><span class="sig-paren">(</span><em>feed</em>, <em>category=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/rss_feed_parsers.html#RSSFeedParser.parse_feed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.rss_feed_parsers.RSSFeedParser.parse_feed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a raw RSS feed, and extract interested information.</p>
+<p>The extracted information includes all news entries inside the feed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>feed</strong> (<em>dict</em>) – Raw RSS feed object.
+Typically this can be obtained by calling <code class="docutils literal notranslate"><span class="pre">get_raw_feed_obj()</span></code>.</li>
+<li><strong>category</strong> (<em>str, optional</em>) – Category of the RSS source.
+This will be added to news entries inside the RSS feed as tags.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>RssFeed</em> – A RssFeed containing interested information of the raw RSS feed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.rss_feed_parsers.YahooFeedParser">
+<em class="property">class </em><code class="descclassname">news_scraper.rss_feed_parsers.</code><code class="descname">YahooFeedParser</code><a class="reference internal" href="_modules/news_scraper/rss_feed_parsers.html#YahooFeedParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.rss_feed_parsers.YahooFeedParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.rss_feed_parsers.RSSFeedParser" title="news_scraper.rss_feed_parsers.RSSFeedParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.rss_feed_parsers.RSSFeedParser</span></code></a></p>
+<p>RSS feed parser for Yahoo RSS news sources.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.rss_feed_parsers.get_raw_feed_obj">
+<code class="descclassname">news_scraper.rss_feed_parsers.</code><code class="descname">get_raw_feed_obj</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/rss_feed_parsers.html#get_raw_feed_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.rss_feed_parsers.get_raw_feed_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the url is valid, and retrieves the RSS feed by the url.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> (<em>str</em>) – The RSS link to retrieve.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p><em>dict</em> –</p>
+<dl class="docutils">
+<dt>A dictionary representing the RSS feed.</dt>
+<dd><p class="first last">For more details, please refer to <a class="reference external" href="https://pythonhosted.org/feedparser/introduction.html">feedparser documentation</a></p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">HTTPError</span></code> – If the HTTP errors occurrs when retrieving the RSS feed.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">URLError</span></code> – If the url is incorrect or has some problems.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.local_news_parsers">
+<span id="news-scraper-local-news-parsers-module"></span><h2>news_scraper.local_news_parsers module<a class="headerlink" href="#module-news_scraper.local_news_parsers" title="Permalink to this headline">¶</a></h2>
+<p>This module contains tools to parse a news link to extract news content.</p>
+<dl class="docutils">
+<dt>Purpose:</dt>
+<dd><dl class="first docutils">
+<dt>Google RSS News collects news from local news sources, such as:</dt>
+<dd><ul class="first last simple">
+<li>[自由時報電子報]
+<a class="reference external" href="http://news.ltn.com.tw/">http://news.ltn.com.tw/</a></li>
+<li>[新頭殼]
+<a class="reference external" href="https://newtalk.tw/">https://newtalk.tw/</a></li>
+<li>[中央廣播電台]
+<a class="reference external" href="https://news.rti.org.tw/">https://news.rti.org.tw/</a></li>
+</ul>
+</dd>
+</dl>
+<p class="last">But it does not contain the news content in the RSS feed itself.
+The purpose of this module is to grab the news content from
+the actual news source.</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="news_scraper.local_news_parsers._PARSER_REGISTRY">
+<code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">_PARSER_REGISTRY</code><a class="headerlink" href="#news_scraper.local_news_parsers._PARSER_REGISTRY" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – Maps domain names to local news parsers.
+&lt;Key&gt;: The domain name of the local news source.
+&lt;Value&gt;: The local news parser class.</p>
+<p>When writing a class that inherits the base class <code class="docutils literal notranslate"><span class="pre">HtmlNewsParser</span></code>,
+it is registered in <code class="docutils literal notranslate"><span class="pre">_PARSER_REGISTRY</span></code> automatically.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.local_news_parsers.CnaHtmlNewsParser">
+<em class="property">class </em><code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">CnaHtmlNewsParser</code><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#CnaHtmlNewsParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.CnaHtmlNewsParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.local_news_parsers.HtmlNewsParser" title="news_scraper.local_news_parsers.HtmlNewsParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.local_news_parsers.HtmlNewsParser</span></code></a></p>
+<p>Parser for the local news source “中央通訊社 (CNA)”.</p>
+<dl class="attribute">
+<dt id="news_scraper.local_news_parsers.CnaHtmlNewsParser.source_base_urls">
+<code class="descname">source_base_urls</code><a class="headerlink" href="#news_scraper.local_news_parsers.CnaHtmlNewsParser.source_base_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(str)</em> – Posible domain names for this local news source.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.local_news_parsers.CnaHtmlNewsParser.get_news_content_from_url">
+<code class="descname">get_news_content_from_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#CnaHtmlNewsParser.get_news_content_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.CnaHtmlNewsParser.get_news_content_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get news content from the news link.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>str</em>) – The link of the local news.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> – News content of the local news.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.local_news_parsers.DefaultHtmlNewsParser">
+<em class="property">class </em><code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">DefaultHtmlNewsParser</code><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#DefaultHtmlNewsParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.DefaultHtmlNewsParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.local_news_parsers.HtmlNewsParser" title="news_scraper.local_news_parsers.HtmlNewsParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.local_news_parsers.HtmlNewsParser</span></code></a></p>
+<p>Parser for local news sources whose html_parser is not yet implemented.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.local_news_parsers.EtodayHtmlNewsParser">
+<em class="property">class </em><code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">EtodayHtmlNewsParser</code><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#EtodayHtmlNewsParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.EtodayHtmlNewsParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.local_news_parsers.HtmlNewsParser" title="news_scraper.local_news_parsers.HtmlNewsParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.local_news_parsers.HtmlNewsParser</span></code></a></p>
+<p>Parser for the local news source “ETtoday 新聞雲”.</p>
+<dl class="attribute">
+<dt id="news_scraper.local_news_parsers.EtodayHtmlNewsParser.source_base_urls">
+<code class="descname">source_base_urls</code><a class="headerlink" href="#news_scraper.local_news_parsers.EtodayHtmlNewsParser.source_base_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(str)</em> – Posible domain names for this local news source.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.local_news_parsers.EtodayHtmlNewsParser.get_news_content_from_url">
+<code class="descname">get_news_content_from_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#EtodayHtmlNewsParser.get_news_content_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.EtodayHtmlNewsParser.get_news_content_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get news content from the news link.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>str</em>) – The link of the local news.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> – News content of the local news.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.local_news_parsers.HtmlNewsParser">
+<em class="property">class </em><code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">HtmlNewsParser</code><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#HtmlNewsParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.HtmlNewsParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for local news parsers.</p>
+<p>Subclasses of this class are registered to <code class="docutils literal notranslate"><span class="pre">_PARSER_REGISTRY</span></code>.
+Note that this class can not be instanciated by metaclass <code class="docutils literal notranslate"><span class="pre">LocalNewsMeta</span></code>.</p>
+<dl class="attribute">
+<dt id="news_scraper.local_news_parsers.HtmlNewsParser.source_base_urls">
+<code class="descname">source_base_urls</code><a class="headerlink" href="#news_scraper.local_news_parsers.HtmlNewsParser.source_base_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(str)</em> – Domain names for the local news source.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.local_news_parsers.HtmlNewsParser.get_news_content_from_url">
+<code class="descname">get_news_content_from_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#HtmlNewsParser.get_news_content_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.HtmlNewsParser.get_news_content_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get news content from the local news source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>str</em>) – The link of the local news.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> – News content of the local news.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.local_news_parsers.LocalNewsMeta">
+<em class="property">class </em><code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">LocalNewsMeta</code><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#LocalNewsMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.LocalNewsMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></p>
+<p>Meta class for <code class="docutils literal notranslate"><span class="pre">HtmlNewsParser</span></code> to register subclasses.</p>
+<p>To register &lt;domain_name, parser_class&gt; mappings to <code class="docutils literal notranslate"><span class="pre">_PARSER_REGISTRY</span></code>.</p>
+<p>Note that the base class itself will not be registered.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.local_news_parsers.LtnHtmlNewsParser">
+<em class="property">class </em><code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">LtnHtmlNewsParser</code><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#LtnHtmlNewsParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.LtnHtmlNewsParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.local_news_parsers.HtmlNewsParser" title="news_scraper.local_news_parsers.HtmlNewsParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.local_news_parsers.HtmlNewsParser</span></code></a></p>
+<p>Parser for the local news source “自由時報 (LTN)”.</p>
+<dl class="attribute">
+<dt id="news_scraper.local_news_parsers.LtnHtmlNewsParser.source_base_urls">
+<code class="descname">source_base_urls</code><a class="headerlink" href="#news_scraper.local_news_parsers.LtnHtmlNewsParser.source_base_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(str)</em> – Posible domain names for this local news source.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.local_news_parsers.LtnHtmlNewsParser.get_news_content_from_url">
+<code class="descname">get_news_content_from_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#LtnHtmlNewsParser.get_news_content_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.LtnHtmlNewsParser.get_news_content_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get news content from the news link.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>str</em>) – The link of the local news.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> – News content of the local news.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="news_scraper.local_news_parsers.UdnHtmlNewsParser">
+<em class="property">class </em><code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">UdnHtmlNewsParser</code><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#UdnHtmlNewsParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.UdnHtmlNewsParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#news_scraper.local_news_parsers.HtmlNewsParser" title="news_scraper.local_news_parsers.HtmlNewsParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">news_scraper.local_news_parsers.HtmlNewsParser</span></code></a></p>
+<p>Parser for the local news source “聯合新聞網 (UDN)”.</p>
+<dl class="attribute">
+<dt id="news_scraper.local_news_parsers.UdnHtmlNewsParser.source_base_urls">
+<code class="descname">source_base_urls</code><a class="headerlink" href="#news_scraper.local_news_parsers.UdnHtmlNewsParser.source_base_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(str)</em> – Posible domain names for this local news source.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.local_news_parsers.UdnHtmlNewsParser.get_news_content_from_url">
+<code class="descname">get_news_content_from_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#UdnHtmlNewsParser.get_news_content_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.UdnHtmlNewsParser.get_news_content_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get news content from the news link.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> (<em>str</em>) – The link of the local news.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> – News content of the local news.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.local_news_parsers.get_local_parser_registry">
+<code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">get_local_parser_registry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#get_local_parser_registry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.get_local_parser_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the dict mapping domain names to local news parsers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – A copy of <code class="docutils literal notranslate"><span class="pre">_PARSER_REGISTRY</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.local_news_parsers.update_local_news_sources_list">
+<code class="descclassname">news_scraper.local_news_parsers.</code><code class="descname">update_local_news_sources_list</code><span class="sig-paren">(</span><em>news_entries</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/local_news_parsers.html#update_local_news_sources_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.local_news_parsers.update_local_news_sources_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function maintains a list of possible local news sources to a file.</p>
+<p>Note that this is not necessarily.
+This purpose is to know whether there are common local news websites
+whose parsers are not yet implemented.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>news_entries</strong> (<em>Iterable(scraper_models.NewsRSSEntry)</em>) – News eitries
+to extract the news source websites from.</li>
+<li><strong>filename</strong> (<em>str</em>) – The name of the file to store the updated list
+and to read the current list from.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.scraping_rules_reader">
+<span id="news-scraper-scraping-rules-reader-module"></span><h2>news_scraper.scraping_rules_reader module<a class="headerlink" href="#module-news_scraper.scraping_rules_reader" title="Permalink to this headline">¶</a></h2>
+<p>This module contains tools to read scraping_rules from a file.</p>
+<dl class="attribute">
+<dt id="news_scraper.scraping_rules_reader.ESSENTIAL_ATTRIBUTES">
+<code class="descclassname">news_scraper.scraping_rules_reader.</code><code class="descname">ESSENTIAL_ATTRIBUTES</code><a class="headerlink" href="#news_scraper.scraping_rules_reader.ESSENTIAL_ATTRIBUTES" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>tuple(str)</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="news_scraper.scraping_rules_reader.OPTIONAL_ATTRIBUTES">
+<code class="descclassname">news_scraper.scraping_rules_reader.</code><code class="descname">OPTIONAL_ATTRIBUTES</code><a class="headerlink" href="#news_scraper.scraping_rules_reader.OPTIONAL_ATTRIBUTES" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>tuple(str)</em> – Attributes that are optional.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="news_scraper.scraping_rules_reader.ScrapingRuleFormatError">
+<em class="property">exception </em><code class="descclassname">news_scraper.scraping_rules_reader.</code><code class="descname">ScrapingRuleFormatError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraping_rules_reader.html#ScrapingRuleFormatError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraping_rules_reader.ScrapingRuleFormatError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">scraper_utils.NewsScrapperError</span></code></p>
+<p>Indicates that a rule has invalid format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.scraping_rules_reader.get_rules_from_file">
+<code class="descclassname">news_scraper.scraping_rules_reader.</code><code class="descname">get_rules_from_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraping_rules_reader.html#get_rules_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraping_rules_reader.get_rules_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse scraping rules from a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – File name of the rule file to parse.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><em>scraper_models.ScrapingRule</em> – A scraping rule defined in the input file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#news_scraper.scraping_rules_reader.ScrapingRuleFormatError" title="news_scraper.scraping_rules_reader.ScrapingRuleFormatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ScrapingRuleFormatError</span></code></a> – If a rule has invalid format.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.scraper_utils">
+<span id="news-scraper-scraper-utils-module"></span><h2>news_scraper.scraper_utils module<a class="headerlink" href="#module-news_scraper.scraper_utils" title="Permalink to this headline">¶</a></h2>
+<p>Common utilities used by other modules.</p>
+<dl class="attribute">
+<dt id="news_scraper.scraper_utils.log_format">
+<code class="descclassname">news_scraper.scraper_utils.</code><code class="descname">log_format</code><a class="headerlink" href="#news_scraper.scraper_utils.log_format" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – default log format.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="news_scraper.scraper_utils.NewsScrapperError">
+<em class="property">exception </em><code class="descclassname">news_scraper.scraper_utils.</code><code class="descname">NewsScrapperError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_utils.html#NewsScrapperError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_utils.NewsScrapperError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></a></p>
+<p>Basic Error for the <code class="docutils literal notranslate"><span class="pre">news_scraper</span></code> project.</p>
+<dl class="docutils">
+<dt>Error messages are logged to <code class="docutils literal notranslate"><span class="pre">logging.getLogger('error_log')</span></code></dt>
+<dd>with the <code class="docutils literal notranslate"><span class="pre">logging.error()</span></code> method.</dd>
+</dl>
+<p>If the logger is not set, write msg to both stdout and a file named ‘error.log’.</p>
+<dl class="attribute">
+<dt id="news_scraper.scraper_utils.NewsScrapperError.logger">
+<code class="descname">logger</code><a class="headerlink" href="#news_scraper.scraper_utils.NewsScrapperError.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>logging.Logger</em> – The logger named ‘error_log’.</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>str</em>) – Error message to log.</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="news_scraper.scraper_utils.NewsScrapperError.setup_error_logger">
+<em class="property">classmethod </em><code class="descname">setup_error_logger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_utils.html#NewsScrapperError.setup_error_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_utils.NewsScrapperError.setup_error_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up logger for error log</p>
+<p>If a logger with name ‘error_log’ does not exist yet, set it up.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.scraper_utils.extract_domain_name_from_url">
+<code class="descclassname">news_scraper.scraper_utils.</code><code class="descname">extract_domain_name_from_url</code><span class="sig-paren">(</span><em>link</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_utils.html#extract_domain_name_from_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_utils.extract_domain_name_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the domain name from a url.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>link</strong> (<em>str</em>) – A url.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> – The domain name in the url.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.scraper_utils.log_warning">
+<code class="descclassname">news_scraper.scraper_utils.</code><code class="descname">log_warning</code><span class="sig-paren">(</span><em>msg</em>, <em>is_error=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_utils.html#log_warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_utils.log_warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log warnings or errors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>msg</strong> (<em>str</em>) – Error message to log.</li>
+<li><strong>is_error</strong> (<em>bool, optional</em>) – True to log as an error, and
+False (default) to log as a warning.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#news_scraper.scraper_utils.NewsScrapperError" title="news_scraper.scraper_utils.NewsScrapperError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NewsScrapperError</span></code></a> – If a logger with name ‘error_log’ has not been set up.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.scraper_utils.read_json_from_file">
+<code class="descclassname">news_scraper.scraper_utils.</code><code class="descname">read_json_from_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_utils.html#read_json_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_utils.read_json_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read data in JSON format from file.</p>
+<p>If the file does not exist yet, create an empty one, and return an empty dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Name of the input file to read.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – A JSON (dict) object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="news_scraper.scraper_utils.setup_logger">
+<code class="descclassname">news_scraper.scraper_utils.</code><code class="descname">setup_logger</code><span class="sig-paren">(</span><em>name</em>, <em>level=20</em>, <em>logfile=None</em>, <em>to_console=True</em>, <em>log_format='[%(levelname)s] [%(asctime)s] %(message)s\n'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/scraper_utils.html#setup_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.scraper_utils.setup_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up <code class="docutils literal notranslate"><span class="pre">logging.logger</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) – Name of the logger to set up.</li>
+<li><strong>level</strong> (<em>int, optional</em>) – Default to logging.DEBUG.</li>
+<li><strong>logfile</strong> (<em>str, optional</em>) – Filename of the error log file.
+If specified, the error message will be written to the file.
+Defaults to None.</li>
+<li><strong>to_console</strong> (<em>bool, optional</em>) – Whether to log message to standard output.
+Defaults to True.</li>
+<li><strong>log_format</strong> (<em>str, optional</em>) – The log format. Default to <code class="docutils literal notranslate"><span class="pre">DEFAULT_LOG_FORMAT</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>logging.Logger</em> – The logger object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-news_scraper.db_news_api">
+<span id="news-scraper-db-news-api-module"></span><h2>news_scraper.db_news_api module<a class="headerlink" href="#module-news_scraper.db_news_api" title="Permalink to this headline">¶</a></h2>
+<p>This module provides tools to CRUD news_data and scraping_rules in the DB.</p>
+<p class="rubric">Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">scraper_models</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="n">DATABASE_CONFIG</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="n">db_api</span> <span class="o">=</span> <span class="n">NewsDatabaseAPI</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_prefix</span><span class="o">=</span><span class="s2">&quot;my_focus_news&quot;</span><span class="p">)</span>
+    <span class="n">rules</span> <span class="o">=</span> <span class="n">db_api</span><span class="o">.</span><span class="n">get_scraping_rules</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI">
+<em class="property">class </em><code class="descclassname">news_scraper.db_news_api.</code><code class="descname">NewsDatabaseAPI</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This class provides APIs to manipulate models in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conn</strong> (<em>db_operation_api.mydb.MyDB</em>) – A database connection.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI.get_news_data_and_setup_rule">
+<code class="descname">get_news_data_and_setup_rule</code><span class="sig-paren">(</span><em>scraping_rules</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI.get_news_data_and_setup_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI.get_news_data_and_setup_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read news data from DB and set scraping_rules to them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scraping_rules</strong> (<em>Iterable(ScrapingRule)</em>) – Scraping_rules to decide
+whether each news is of interest.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> –<dl class="docutils">
+<dt>A dict that maps id to a news.</dt>
+<dd>&lt;Key&gt;: id filed of a news in the database.
+&lt;Value&gt;: An instance of <code class="docutils literal notranslate"><span class="pre">NewsRSSEntry</span></code>.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI.get_scraping_rules">
+<code class="descname">get_scraping_rules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI.get_scraping_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI.get_scraping_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read scraping rules from DB.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> –<dl class="docutils">
+<dt>A dict that maps id to a scraping rule.</dt>
+<dd>&lt;Key&gt;: id filed of a rule in the database.
+&lt;Value&gt;: An instance of <code class="docutils literal notranslate"><span class="pre">ScrapingRule</span></code>.</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI.remove_all_rules_and_relations">
+<code class="descname">remove_all_rules_and_relations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI.remove_all_rules_and_relations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI.remove_all_rules_and_relations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all scraping rules and relationship with NewsData from DB.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI.reset_news_data">
+<code class="descname">reset_news_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI.reset_news_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI.reset_news_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all news data from DB.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI.setup_news_rule_relationship">
+<code class="descname">setup_news_rule_relationship</code><span class="sig-paren">(</span><em>news_id</em>, <em>rule_id</em>, <em>score</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI.setup_news_rule_relationship"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI.setup_news_rule_relationship" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up score and relationship between a news and a rule.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI.store_a_news_data">
+<code class="descname">store_a_news_data</code><span class="sig-paren">(</span><em>news</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI.store_a_news_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI.store_a_news_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a news to DB, and setup score and relationships with ScrapingRules.</p>
+<p>Note that scrapig rules should have exists in DB before this method is called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>news</strong> (<em>NewsRSSEntry</em>) – The news to store to DB.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">scraper_utils.NewsScrapperError</span></code> – If <code class="docutils literal notranslate"><span class="pre">news</span></code> is not instance of NewsRSSEntry.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="news_scraper.db_news_api.NewsDatabaseAPI.store_a_scraping_rule">
+<code class="descname">store_a_scraping_rule</code><span class="sig-paren">(</span><em>rule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news_scraper/db_news_api.html#NewsDatabaseAPI.store_a_scraping_rule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#news_scraper.db_news_api.NewsDatabaseAPI.store_a_scraping_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a scraping rule into DB.</p>
+<p>Note that this only stores &lt;rule, keywords, tags&gt; into DB, and does
+not handle relationship with NewsRSSEntry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rule</strong> (<em>ScrapingRule</em>) – The scraping rule to store to DB.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">scraper_utils.NewsScrapperError</span></code> – If <code class="docutils literal notranslate"><span class="pre">rule</span></code> is not instance of ScrapingRule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="news_scraper.db_operation_api.html" title="news_scraper.db_operation_api package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to my_focus_news’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">my_focus_news  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, gn01842919.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

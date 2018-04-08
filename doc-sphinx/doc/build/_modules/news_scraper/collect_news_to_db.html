@@ -1,0 +1,267 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>news_scraper.collect_news_to_db &#8212; my_focus_news  documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for news_scraper.collect_news_to_db</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module collects news, filter them by rules, and store them to DB.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    This module can be executed directly:</span>
+
+<span class="sd">    .. code-block:: console</span>
+
+<span class="sd">        $ python collect_news_to_db.py</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># Standard library</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">concurrent</span> <span class="k">import</span> <span class="n">futures</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="k">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="k">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
+<span class="c1"># Local modules</span>
+<span class="kn">import</span> <span class="nn">scraper_utils</span>
+<span class="kn">from</span> <span class="nn">settings</span> <span class="k">import</span> <span class="n">SCRAPER_CONFIG</span><span class="p">,</span> <span class="n">DATABASE_CONFIG</span>
+<span class="kn">from</span> <span class="nn">db_news_api</span> <span class="k">import</span> <span class="n">NewsDatabaseAPI</span>
+<span class="kn">from</span> <span class="nn">db_operation_api.mydb</span> <span class="k">import</span> <span class="n">get_database</span>
+<span class="kn">from</span> <span class="nn">local_news_parsers</span> <span class="k">import</span> <span class="n">update_local_news_sources_list</span>
+<span class="kn">from</span> <span class="nn">news_sources</span> <span class="k">import</span> <span class="n">get_news_source_registry</span>
+<span class="kn">from</span> <span class="nn">scraping_rules_reader</span> <span class="k">import</span> <span class="n">get_rules_from_file</span>
+
+
+<div class="viewcode-block" id="scrape_news_and_save_to_db"><a class="viewcode-back" href="../../news_scraper.html#news_scraper.collect_news_to_db.scrape_news_and_save_to_db">[docs]</a><span class="k">def</span> <span class="nf">scrape_news_and_save_to_db</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Collect news, filter them by rules, and store them to DB.</span>
+
+<span class="sd">    This method does the following:</span>
+<span class="sd">        1. Read scraping rules from file.</span>
+<span class="sd">        2. Read scraping rules from DB.</span>
+<span class="sd">        3. If rules have changed, update the the rules in DB by rules from file.</span>
+<span class="sd">        4. Retrieve news data from RSS news links.</span>
+<span class="sd">        5. Filter the news by scraping rules, and save the result to DB.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="n">SCRAPER_CONFIG</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">]</span>
+    <span class="n">rule_file</span> <span class="o">=</span> <span class="n">SCRAPER_CONFIG</span><span class="p">[</span><span class="s2">&quot;rule_file&quot;</span><span class="p">]</span>
+    <span class="n">error_log</span> <span class="o">=</span> <span class="n">SCRAPER_CONFIG</span><span class="p">[</span><span class="s2">&quot;error_log&quot;</span><span class="p">]</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+
+    <span class="c1"># Set up loggers</span>
+    <span class="n">log_format</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">%(levelname)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">scraper_utils</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span>
+        <span class="s1">&#39;error_log&#39;</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+        <span class="n">logfile</span><span class="o">=</span><span class="n">error_log</span><span class="p">,</span>
+        <span class="n">to_console</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">log_format</span><span class="o">=</span><span class="n">log_format</span>
+    <span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">log_format</span><span class="p">)</span>
+
+    <span class="c1"># Get scraping rules</span>
+    <span class="n">rules_from_file</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">get_rules_from_file</span><span class="p">(</span><span class="n">rule_file</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">get_database</span><span class="p">(</span><span class="n">DATABASE_CONFIG</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">db_api</span> <span class="o">=</span> <span class="n">NewsDatabaseAPI</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+
+        <span class="n">rules_from_db</span> <span class="o">=</span> <span class="n">db_api</span><span class="o">.</span><span class="n">get_scraping_rules</span><span class="p">()</span>
+
+        <span class="c1"># If rules have changed ==&gt; update scores in DB</span>
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">rules_from_file</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">rules_from_db</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ScrapingRules have changed. Reload rules to DB.&quot;</span><span class="p">)</span>
+
+            <span class="n">db_api</span><span class="o">.</span><span class="n">remove_all_rules_and_relations</span><span class="p">()</span>
+            <span class="n">_save_scraping_rules_to_db</span><span class="p">(</span><span class="n">db_api</span><span class="p">,</span> <span class="n">rules_from_file</span><span class="p">)</span>
+
+            <span class="n">_update_scores_for_news_in_db</span><span class="p">(</span><span class="n">db_api</span><span class="p">,</span> <span class="n">rules_from_file</span><span class="p">)</span>
+
+        <span class="c1"># Get news from RSS feeds and apply rules</span>
+        <span class="n">news_entries</span> <span class="o">=</span> <span class="n">_scrape_news_data_and_set_rules</span><span class="p">(</span><span class="n">rules_from_file</span><span class="p">)</span>
+
+        <span class="c1"># Filter the news by the rules (So target_news is the news of interest)</span>
+        <span class="n">target_news</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">news</span> <span class="k">for</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">news_entries</span> <span class="k">if</span> <span class="n">news</span><span class="o">.</span><span class="n">total_score</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Save to db</span>
+        <span class="n">_save_news_data_to_db</span><span class="p">(</span><span class="n">db_api</span><span class="p">,</span> <span class="n">target_news</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="c1"># For future development</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating &#39;local_news_sources.txt&#39;...&quot;</span><span class="p">)</span>
+        <span class="n">update_local_news_sources_list</span><span class="p">(</span><span class="n">news_entries</span><span class="p">,</span> <span class="s2">&quot;local_news_sources.txt&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Record all news for debugging</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;output.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">news_entries</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">news</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">outfile</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">target_news</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">news</span><span class="p">))</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Recorded </span><span class="si">%d</span><span class="s2"> news out of total </span><span class="si">%d</span><span class="s2"> news. Elapsed time: </span><span class="si">%f</span><span class="s2"> seconds&quot;</span>
+        <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target_news</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">news_entries</span><span class="p">),</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_scrape_news_data_and_set_rules</span><span class="p">(</span><span class="n">scraping_rules</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve news entries from the Internet, and set scraping rules to them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feeds</span> <span class="o">=</span> <span class="n">_scrape_registered_news_by_rss</span><span class="p">()</span>
+    <span class="n">news_entries</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">entry</span> <span class="k">for</span> <span class="n">feed</span> <span class="ow">in</span> <span class="n">feeds</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entries</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">news_entries</span><span class="p">:</span>
+        <span class="n">news</span><span class="o">.</span><span class="n">set_rules</span><span class="p">(</span><span class="n">scraping_rules</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">news_entries</span>
+
+
+<span class="k">def</span> <span class="nf">_save_scraping_rules_to_db</span><span class="p">(</span><span class="n">db_api</span><span class="p">,</span> <span class="n">scraping_rules</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">scraping_rules</span><span class="p">:</span>
+        <span class="n">db_api</span><span class="o">.</span><span class="n">store_a_scraping_rule</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_update_scores_for_news_in_db</span><span class="p">(</span><span class="n">db_api</span><span class="p">,</span> <span class="n">new_rules_to_apply</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update scores with scraping rules for all news data in DB.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rules_from_db</span> <span class="o">=</span> <span class="n">db_api</span><span class="o">.</span><span class="n">get_scraping_rules</span><span class="p">()</span>  <span class="c1"># read from db again to get id</span>
+    <span class="n">rule_id_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">value</span><span class="p">:</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">rules_from_db</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="n">news_from_db</span> <span class="o">=</span> <span class="n">db_api</span><span class="o">.</span><span class="n">get_news_data_and_setup_rule</span><span class="p">(</span><span class="n">new_rules_to_apply</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">news_id</span><span class="p">,</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">news_from_db</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">rule</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">news</span><span class="o">.</span><span class="n">rule_score_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">rule_id</span> <span class="o">=</span> <span class="n">rule_id_map</span><span class="p">[</span><span class="n">rule</span><span class="p">]</span>
+            <span class="n">db_api</span><span class="o">.</span><span class="n">setup_news_rule_relationship</span><span class="p">(</span><span class="n">news_id</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_save_news_data_to_db</span><span class="p">(</span><span class="n">db_api</span><span class="p">,</span> <span class="n">news_entries</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">news_entries</span><span class="p">:</span>
+        <span class="n">db_api</span><span class="o">.</span><span class="n">store_a_news_data</span><span class="p">(</span><span class="n">news</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_scrape_registered_news_by_rss</span><span class="p">(</span>
+        <span class="n">num_of_workers</span><span class="o">=</span><span class="n">SCRAPER_CONFIG</span><span class="p">[</span><span class="s2">&quot;max_workers&quot;</span><span class="p">],</span>
+        <span class="n">worker_timeout</span><span class="o">=</span><span class="n">SCRAPER_CONFIG</span><span class="p">[</span><span class="s2">&quot;rss_worker_timeout&quot;</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve RSS news from the Internet with a thread pool.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">num_of_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">future_map</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># For each registered news source, put it into thread pool</span>
+        <span class="n">news_sources</span> <span class="o">=</span> <span class="n">get_news_source_registry</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">news_source_class</span> <span class="ow">in</span> <span class="n">news_sources</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">news_src</span> <span class="o">=</span> <span class="n">news_source_class</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">news_src</span><span class="o">.</span><span class="n">categories</span><span class="p">:</span>
+                <span class="n">future_obj</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">news_src</span><span class="o">.</span><span class="n">get_raw_feed_object</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+                <span class="n">future_map</span><span class="p">[</span><span class="n">future_obj</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">news_src</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Retrieving </span><span class="si">%d</span><span class="s2"> RSS feeds concurrently.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">future_map</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">done_iter</span> <span class="o">=</span> <span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">future_map</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">worker_timeout</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">future_obj</span> <span class="ow">in</span> <span class="n">done_iter</span><span class="p">:</span>
+                <span class="n">news_src</span><span class="p">,</span> <span class="n">category</span> <span class="o">=</span> <span class="n">future_map</span><span class="p">[</span><span class="n">future_obj</span><span class="p">]</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">news_src</span><span class="o">.</span><span class="n">get_rss_url</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">raw_feed</span> <span class="o">=</span> <span class="n">future_obj</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">scraper_utils</span><span class="o">.</span><span class="n">log_warning</span><span class="p">(</span>
+                        <span class="s2">&quot;HTTP Error </span><span class="si">%d</span><span class="s2"> for RSS feed &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="n">URLError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">scraper_utils</span><span class="o">.</span><span class="n">log_warning</span><span class="p">(</span>
+                        <span class="s2">&quot;URL Error [</span><span class="si">%s</span><span class="s2">] for RSS feed &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">news_src</span><span class="o">.</span><span class="n">parse_feed</span><span class="p">(</span><span class="n">raw_feed</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">futures</span><span class="o">.</span><span class="n">TimeoutError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">scraper_utils</span><span class="o">.</span><span class="n">log_warning</span><span class="p">(</span><span class="s2">&quot;Timeout in news_collector: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">scrape_news_and_save_to_db</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">my_focus_news  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, gn01842919.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>
