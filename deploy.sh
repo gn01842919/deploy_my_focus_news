@@ -220,8 +220,8 @@ case "$1" in
         stop_service
         ;;
     restart)
-        start_service
         stop_service
+        start_service
         ;;
     restore)
         restore_all_configs
